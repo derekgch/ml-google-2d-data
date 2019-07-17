@@ -20,8 +20,8 @@ function createModel() {
   const model = tf.sequential(); 
   
   // Add a single hidden layer
-  model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
-  
+  model.add(tf.layers.dense({inputShape: [1], units: 3, useBias: true}));
+  model.add(tf.layers.dense({units: 2, activation: 'sigmoid'}));
   // Add an output layer
   model.add(tf.layers.dense({units: 1, useBias: true}));
 
@@ -75,7 +75,7 @@ async function trainModel(model, inputs, labels) {
   });
   
   const batchSize = 32;
-  const epochs = 50;
+  const epochs = 100;
   
   return await model.fit(inputs, labels, {
     batchSize,
@@ -134,6 +134,14 @@ function testModel(model, inputData, normalizationData) {
   );
 }
 
+const  getModel = async () =>{
+  
+  return await tf.loadLayersModel('localstorage://my-model-1');
+}
+
+const storedData = (model) =>{
+  model.save('localstorage://my-model-1');
+}
 
 async function run() {
   // Load and plot the original input data that we are going to train on.
@@ -158,14 +166,26 @@ async function run() {
   const tensorData = convertToTensor(data);
   const {inputs, labels} = tensorData;
       
-  // Train the model  
-  await trainModel(model, inputs, labels);
-  console.log('Done Training');
+  const exisitingModel = getModel();
+  console.log(exisitingModel)
+  // Train the model 
+  exisitingModel
+    .then( (model) =>{
+      console.log('existing model')
+      testModel(model, data, tensorData);
+    },
+    async ()=>{
+      await trainModel(model, inputs, labels);
+      storedData(model);
+      testModel(model, data, tensorData);
+      console.log('Done Training');
+    }
+    )
 
 
   // Make some predictions using the model and compare them to the
   // original data
-  testModel(model, data, tensorData);
+  // testModel(model, data, tensorData);
   // More code will be added below
 }
 
