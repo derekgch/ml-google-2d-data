@@ -167,8 +167,9 @@ async function run() {
   const {inputs, labels} = tensorData;
       
   const exisitingModel = getModel();
-  console.log(exisitingModel)
+  // console.log(exisitingModel)
   // Train the model 
+
   exisitingModel
     .then( (model) =>{
       console.log('existing model')
@@ -181,12 +182,6 @@ async function run() {
       console.log('Done Training');
     }
     )
-
-
-  // Make some predictions using the model and compare them to the
-  // original data
-  // testModel(model, data, tensorData);
-  // More code will be added below
 }
 
 document.addEventListener('DOMContentLoaded', run);
